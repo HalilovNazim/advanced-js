@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Интернет-магазин</title>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
     <header>
-        <button class="btn-cart" type="button">Корзина</button>
+        <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn">Корзина</button>
+            <div id="myDropdown" class="dropdown-content">
+              <a href="#">Item 1</a>
+              <a href="#">Item 2</a>
+              <a href="#">Item 3</a>
+            </div>
+          </div>
     </header>
     <main>
         <div class="products"></div>
