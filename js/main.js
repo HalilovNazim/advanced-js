@@ -1,39 +1,114 @@
-const products = [
-    {id: 1, title: 'Notebook', price: 2000, img: 'img/notebook.jpg'},
-    {id: 2, title: 'Mouse', price: 20, img: 'img/mouse.jpg'},
-    {id: 3, title: 'Keyboard', price: 200, img: 'img/keyboard.jpg'},
-    {id: 4, title: 'Gamepad', price: 50, img: 'img/gamepad.jpg'},
-];
-//Функция для формирования верстки каждого товара
-const renderProduct = (products) => {
-    return `<div class="products__item">
-                <img class="products__pic" src="${products.img}" alt="${products.title}" width="250">
-                <h3 class="products__title">${products.title}</h3>
-                <p class="products__price">${products.price}$</p>
-                <button class="buy-btn">Купить</button>
-            </div>`
-};
-const renderPage = list => {
-    const productsList = list.map(item => renderProduct(item));
-    console.log(productsList);
-    document.querySelector('.products').innerHTML = productsList.join('');
-};
+const API = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
 
-renderPage(products);
 
-function myFunction() {
-    document.getElementById("myDropdown").classList.toggle("show");
-}
+class ProductsPage {
+  constructor(container = '.products'){
+    this.container = container;
+    this.goods = [];//массив товаров
+    this.allProducts = [];//массив объектов
+    this._getProducts()
+        .then(data => { //data - объект js
+            this.goods = [...data];
+            this.render()
+        });
+  }
 
-window.onclick = function(event) {
-  if (!event.target.matches('.dropbtn')) {
+  _getProducts(){
+    return fetch(`${API}/catalogData.json`)
+        .then(result => result.json())
+        .catch(error => console.log(error));
+  }
 
-    let dropdowns = document.getElementsByClassName("dropdown-content");
-    for (let i = 0; i < dropdowns.length; i++) {
-      let openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show')) {
-        openDropdown.classList.remove('show');
-      }
-    }
+  render(){
+    const block = document.querySelector(this.container);
+    this.goods.forEach(product => {
+        const productObj = new ProductItem(product);
+        this.allProducts.push(productObj);
+        block.insertAdjacentHTML('beforeend', productObj.render());
+    });
   }
 }
+class ProductItem {
+  constructor(product, img = 'https://via.placeholder.com/150'){
+        this.title = product.product_name;
+        this.price = product.price;
+        this.id = product.id_product;
+        this.img = img;
+  }
+
+  render(products) {
+    return `<div class="products__item">
+                <img class="products__pic" src="${this.img}" alt="${this.title}" width="250">
+                <h3 class="products__title">${this.title}</h3>
+                <p class="products__price">${this.price}$</p>
+                <button class="buy-btn">Купить</button>
+            </div>`
+  }
+}
+
+class GoodsItem {
+  constructor(product, img = 'https://via.placeholder.com/150'){
+        this.title = product.product_name;
+        this.price = product.price;
+        this.id = product.id_product;
+        this.img = img;
+  }
+
+  render() {
+    return `<div class="good__item">
+                <img class="good__pic" src="${this.img}" alt="${this.title}" width="50">
+                <h3 class="good__title">${this.title}</h3>
+                <p class="good__price">${this.price}$</p>
+            </div>`
+  }
+}
+
+class GoodsList {
+  constructor(container = '.dropdown-content'){
+    this.container = container;
+    this.goods = [];
+    this.allProducts = [];
+    this.amount = 0;
+    this._getProducts()
+      .then(data => {
+        this.goods = [...data.contents];
+        this.amount = data.amount;
+        this.render();
+      });
+
+  }
+
+  _getProducts() {
+    return fetch(`${API}/getBasket.json`)
+      .then(result => result.json())
+      .catch(error => console.log(error));
+  }
+
+  render() {
+    const block = document.querySelector(this.container);
+    this.goods.forEach(good => {
+      const productObj = new GoodsItem(good);
+      this.allProducts.push(productObj);
+      block.insertAdjacentHTML('beforeend', productObj.render());
+    });
+  }
+
+  calcAllGoodsPrice() {
+    let sum = 0;
+    this.goods.forEach(good => {
+      sum += good.price;
+    });
+    console.log(sum);
+    return sum;
+  }
+
+  _myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+  }
+}
+
+
+
+const productList = new ProductsPage();
+
+const list = new GoodsList();
