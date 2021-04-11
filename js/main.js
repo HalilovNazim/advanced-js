@@ -1,6 +1,5 @@
 const API = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
 
-
 class ProductsPage {
   constructor(container = '.products'){
     this.container = container;
